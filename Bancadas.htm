@@ -165,11 +165,16 @@ function mqtt_init(){
 	client = new Paho.MQTT.Client(MQTT_BROKER, port, clientID);
 	client.onConnectionLost = onConnectionLost;
 	client.onMessageArrived = onMessageArrived;
+	mqtt_connect();
+}
+
+function mqtt_connect(){
 	client.connect({onSuccess:onConnect,onFailure: onFailure});
+	pre_log.innerHTML="MQTT1...\n";
 }
 
 function onConnect() {
-	pre_log.innerHTML+="MQTT OK";
+	pre_log.innerHTML="MQTT OK";
 	
 	client.subscribe("<modelo>/<chipIDa>/power");
 	client.subscribe("<modelo>/<chipIDa>/ajuda");
@@ -179,7 +184,8 @@ function onConnect() {
 }
 
 function onFailure(){
-	pre_log.innerHTML+="MQTT FAIL";
+	pre_log.innerHTML="MQTT FAIL";
+	setTimeout(mqtt_connect,1000);
 }
 
 function onConnectionLost(responseObject) {
@@ -187,6 +193,7 @@ function onConnectionLost(responseObject) {
 		console.log("onConnectionLost:"+responseObject.errorMessage);
 		pre_log.innerHTML="MQTT connection lost";
 	}
+	setTimeout(mqtt_connect,1000);
 }
 
 function onMessageArrived(message) {
